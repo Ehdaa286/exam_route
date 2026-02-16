@@ -8,6 +8,7 @@ class CartItem {
   CartItem(this.product, this.quantity);
 }
 
+
 class CartProvider extends ChangeNotifier {
   final List<CartItem> items = [];
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
+import '../services/product_service.dart'; // إضافة استيراد خدمة الـ API إذا كنت تستخدمها
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -15,14 +16,16 @@ class CartScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: const BackButton(color: Colors.black),
-        title:
-            const Text('My Cart', style: TextStyle(color: Colors.black)),
+        title: const Text('My Cart', style: TextStyle(color: Colors.black)),
         actions: [
           Stack(
             children: [
               IconButton(
-                icon: const Icon(Icons.shopping_cart_outlined,
-                    color: Colors.black, size: 26),
+                icon: const Icon(
+                  Icons.shopping_cart_outlined,
+                  color: Colors.black,
+                  size: 26,
+                ),
                 onPressed: () {},
               ),
               if (cart.count > 0)
@@ -32,14 +35,20 @@ class CartScreen extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(2),
                     decoration: const BoxDecoration(
-                        color: Colors.red, shape: BoxShape.circle),
-                    constraints:
-                        const BoxConstraints(minWidth: 16, minHeight: 16),
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
                     child: Center(
                       child: Text(
                         cart.count.toString(),
                         style: const TextStyle(
-                            fontSize: 10, color: Colors.white),
+                          fontSize: 10,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
@@ -63,17 +72,17 @@ class CartScreen extends StatelessWidget {
                 children: [
                   _row('Items Total', '${cart.totalPrice} EGP'),
                   const SizedBox(height: 6),
-                  _row('Shipping Fee', 'Free',
-                      valueColor: Colors.green),
+                  _row('Shipping Fee', 'Free', valueColor: Colors.green),
                   const Divider(),
-                  _row('Total', '${cart.totalPrice} EGP',
-                      isBold: true),
+                  _row('Total', '${cart.totalPrice} EGP', isBold: true),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            Text('${cart.items.length} Items',
-                style: const TextStyle(fontWeight: FontWeight.w600)),
+            Text(
+              '${cart.items.length} Items',
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 12),
             Expanded(
               child: ListView.builder(
@@ -89,39 +98,48 @@ class CartScreen extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        Image.asset(item.product.image, width: 50),
+                        Image.network(item.product.image, width: 50),
+
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(item.product.name,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w600)),
+                              Text(
+                                item
+                                    .product
+                                    .title, // هنا تم تعديلها من name إلى title
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+
                               Text('${item.product.price} EGP'),
                               Row(
                                 children: [
                                   _qtyButton(
                                     icon: Icons.remove,
                                     onTap: () {
-                                      context
-                                          .read<CartProvider>()
-                                          .decrease(item);
+                                      context.read<CartProvider>().decrease(
+                                        item,
+                                      );
                                     },
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 8),
+                                      horizontal: 8,
+                                    ),
                                     child: Text(item.quantity.toString()),
                                   ),
                                   _qtyButton(
                                     icon: Icons.add,
                                     onTap: () {
-                                      context
-                                          .read<CartProvider>()
-                                          .increase(item);
+                                      context.read<CartProvider>().increase(
+                                        item,
+                                      );
                                     },
                                   ),
                                 ],
@@ -130,8 +148,7 @@ class CartScreen extends StatelessWidget {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.delete,
-                              color: Colors.red),
+                          icon: const Icon(Icons.delete, color: Colors.red),
                           onPressed: () {
                             context.read<CartProvider>().remove(item);
                           },
@@ -150,11 +167,11 @@ class CartScreen extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 onPressed: () {},
-                child: const Text('Checkout',
-                    style: TextStyle(fontSize: 16)),
+                child: const Text('Checkout', style: TextStyle(fontSize: 16)),
               ),
             ),
           ],
@@ -163,8 +180,12 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  Widget _row(String title, String value,
-      {bool isBold = false, Color? valueColor}) {
+  Widget _row(
+    String title,
+    String value, {
+    bool isBold = false,
+    Color? valueColor,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -180,8 +201,7 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  Widget _qtyButton(
-      {required IconData icon, required VoidCallback onTap}) {
+  Widget _qtyButton({required IconData icon, required VoidCallback onTap}) {
     return InkWell(
       onTap: onTap,
       child: Container(
